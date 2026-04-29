@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maintenance Strategy — Risk & Responsibility Matrix</title>
+  <meta name="description" content="A pre-contract decision tool for water infrastructure employers to assess maintenance strategy risk and responsibility transfer before signing agreements.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f3; color: #1a1a18; min-height: 100vh; padding: 2rem 1rem; }
+    .container { max-width: 720px; margin: 0 auto; }
+    .brand { text-align: center; margin-bottom: 2rem; }
+    .brand h1 { font-size: 20px; font-weight: 600; color: #0C447C; margin-bottom: 4px; }
+    .brand p { font-size: 13px; color: #5F5E5A; }
+    .card { background: #fff; border: 0.5px solid #d3d1c7; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+    .card-title { font-size: 15px; font-weight: 600; color: #1a1a18; margin-bottom: 4px; }
+    .card-sub { font-size: 12px; color: #5F5E5A; margin-bottom: 1.25rem; }
+    .q-label { font-size: 13px; font-weight: 600; color: #1a1a18; margin-bottom: 5px; }
+    .q-hint { font-size: 11px; color: #888780; margin-bottom: 8px; }
+    .question-row { margin-bottom: 1.25rem; }
+    input[type="text"], input[type="date"] { width: 100%; padding: 9px 12px; font-size: 13px; border: 0.5px solid #d3d1c7; border-radius: 8px; background: #fff; color: #1a1a18; font-family: inherit; margin-bottom: 0; outline: none; }
+    input:focus { border-color: #378ADD; }
+    textarea { width: 100%; font-size: 13px; padding: 9px 12px; border: 0.5px solid #d3d1c7; border-radius: 8px; background: #fff; color: #1a1a18; resize: vertical; min-height: 60px; font-family: inherit; outline: none; }
+    textarea:focus { border-color: #378ADD; }
+    .btn-primary { width: 100%; padding: 10px; font-size: 14px; border-radius: 8px; border: none; background: #185FA5; color: #fff; cursor: pointer; font-family: inherit; margin-top: 1rem; }
+    .btn-primary:hover { background: #0C447C; }
+    .progress-wrap { background: #e8e6df; border-radius: 4px; height: 6px; margin-bottom: 6px; }
+    .progress-bar { background: #185FA5; height: 6px; border-radius: 4px; transition: width 0.4s; }
+    .progress-label { font-size: 12px; color: #888780; margin-bottom: 1rem; }
+    .topic-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.5rem; }
+    .tab-btn { font-size: 12px; padding: 5px 12px; border-radius: 20px; border: 0.5px solid #b4b2a9; background: #fff; color: #5F5E5A; cursor: pointer; font-family: inherit; }
+    .tab-btn.active { background: #185FA5; color: #fff; border-color: #185FA5; }
+    .tab-btn.done { background: #EAF3DE; color: #3B6D11; border-color: #639922; }
+    .rating-row { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+    .r-btn { flex: 1; min-width: 100px; padding: 7px 6px; font-size: 12px; border: 0.5px solid #d3d1c7; border-radius: 8px; background: #f1efe8; color: #5F5E5A; cursor: pointer; text-align: center; font-family: inherit; }
+    .r-btn.sel-1 { background: #FCEBEB; color: #A32D2D; border-color: #A32D2D; }
+    .r-btn.sel-2 { background: #FAEEDA; color: #854F0B; border-color: #EF9F27; }
+    .r-btn.sel-3 { background: #E6F1FB; color: #185FA5; border-color: #378ADD; }
+    .r-btn.sel-4 { background: #EAF3DE; color: #3B6D11; border-color: #639922; }
+    .concern-tag { display: inline-block; font-size: 11px; padding: 3px 9px; background: #E6F1FB; color: #185FA5; border-radius: 10px; margin: 2px; cursor: pointer; border: 0.5px solid transparent; }
+    .nav-row { display: flex; gap: 10px; margin-top: 1rem; }
+    .nav-row button { flex: 1; padding: 10px; font-size: 14px; border-radius: 8px; border: 0.5px solid #b4b2a9; background: #fff; color: #1a1a18; cursor: pointer; font-family: inherit; }
+    .nav-row button.primary { background: #185FA5; color: #fff; border-color: #185FA5; }
+    .nav-row button.primary:hover { background: #0C447C; }
+    .nav-row button:disabled { opacity: 0.35; cursor: default; }
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+    .metric-card { background: #f1efe8; border-radius: 8px; padding: 1rem; }
+    .metric-label { font-size: 12px; color: #5F5E5A; margin-bottom: 4px; }
+    .metric-val { font-size: 24px; font-weight: 600; color: #1a1a18; }
+    .risk-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .risk-high { background: #FCEBEB; color: #A32D2D; }
+    .risk-med { background: #FAEEDA; color: #854F0B; }
+    .risk-low { background: #EAF3DE; color: #3B6D11; }
+    .row-item { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 0.5px solid #e8e6df; font-size: 13px; }
+    .row-item:last-child { border-bottom: none; }
+    .export-btn { width: 100%; padding: 11px; margin-top: 10px; font-size: 14px; border-radius: 8px; border: 0.5px solid #185FA5; background: transparent; color: #185FA5; cursor: pointer; font-family: inherit; display: block; }
+    .export-btn:hover { background: #E6F1FB; }
+    .export-btn.secondary { border-color: #b4b2a9; color: #5F5E5A; }
+    .export-btn.secondary:hover { background: #f1efe8; }
+    .footer { text-align: center; font-size: 11px; color: #888780; margin-top: 2rem; padding-top: 1rem; border-top: 0.5px solid #e8e6df; }
+    @media (max-width: 500px) {
+      .summary-grid { grid-template-columns: 1fr; }
+      .rating-row { flex-direction: column; }
+      .r-btn { min-width: unset; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="brand">
+    <h1>Maintenance Strategy — Risk & Responsibility Matrix</h1>
+    <p>Water infrastructure project | Pre-contract employer assessment tool</p>
+  </div>
+
+  <div id="project-setup">
+    <div class="card">
+      <div class="card-title">Project details</div>
+      <div class="card-sub">Enter basic project information before starting the assessment</div>
+      <div class="question-row">
+        <div class="q-label">Project name / reference</div>
+        <input type="text" id="proj-name" placeholder="e.g. WTW Phase 2 Upgrade — Contract Ref 2024-WI-047">
+      </div>
+      <div class="question-row">
+        <div class="q-label">Contractor / installer</div>
+        <input type="text" id="proj-contractor" placeholder="e.g. ABC Water Solutions Ltd">
+      </div>
+      <div class="question-row" style="margin-bottom:0">
+        <div class="q-label">Assessment date</div>
+        <input type="date" id="proj-date">
+      </div>
+      <button class="btn-primary" onclick="startAssessment()">Start assessment →</button>
+    </div>
+  </div>
+
+  <div id="assessment-view" style="display:none;">
+    <div class="card" style="margin-bottom:1rem;padding:1rem 1.25rem">
+      <div style="font-size:13px;font-weight:600;color:#1a1a18" id="assess-title"></div>
+      <div style="font-size:12px;color:#5F5E5A" id="assess-sub"></div>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="prog-bar" style="width:0%"></div></div>
+    <div class="progress-label" id="prog-label"></div>
+    <div class="topic-tabs" id="topic-tabs"></div>
+    <div id="topic-card"></div>
+    <div class="nav-row">
+      <button id="btn-prev" onclick="prevTopic()" disabled>← Previous</button>
+      <button class="primary" id="btn-next" onclick="nextTopic()">Next topic →</button>
+    </div>
+  </div>
+
+  <div id="summary-view" style="display:none;"></div>
+
+  <div class="footer">Built for water infrastructure employers &mdash; pre-contract maintenance risk assessment</div>
+
+</div>
+<script>
+const topics = [
+  {
+    id:"lifecycle", label:"Asset lifecycle", full:"Asset lifecycle & replacement schedules",
+    sub:"Clarity on expected service life, replacement triggers, and who funds replacements",
+    questions:[
+      {id:"lc1",q:"Has the contractor provided a full asset register with expected service life for each major component?",hint:"Pumps, motors, valves, instrumentation, structural elements",concerns:["Incomplete asset register","No service life data","Components missing"]},
+      {id:"lc2",q:"Are replacement schedules aligned with the project's design life and the employer's capital planning cycles?",hint:"Typically 25–30 year design life for water infrastructure",concerns:["Misaligned replacement schedule","No capital plan alignment","Short design life"]},
+      {id:"lc3",q:"Has responsibility for end-of-life replacement costs been explicitly allocated?",hint:"Capex vs Opex boundary — who funds major replacements?",concerns:["Capex/Opex ambiguity","Replacement cost not allocated","No sinking fund provision"]}
+    ]
+  },
+  {
+    id:"spares", label:"Spare parts", full:"Spare parts & supply chain responsibility",
+    sub:"Availability, stocking obligations, and long-term supply continuity",
+    questions:[
+      {id:"sp1",q:"Has the contractor specified recommended spare parts holdings and identified who is responsible for stocking them?",hint:"Critical spares vs consumables — initial stock, replenishment obligations",concerns:["No spares schedule","Stocking responsibility unclear","Critical spares not identified"]},
+      {id:"sp2",q:"Are parts proprietary or available through open supply chains? Is there a long-term supply continuity commitment?",hint:"Proprietary parts carry supply risk — 10–20 year horizon",concerns:["Proprietary lock-in","No supply continuity plan","Single-source components"]},
+      {id:"sp3",q:"Is there a defined process for obsolescence management and what happens when parts become unavailable?",hint:"Especially relevant for instrumentation, control systems, specialist equipment",concerns:["No obsolescence plan","Obsolescence risk not addressed","No substitution pathway"]}
+    ]
+  },
+  {
+    id:"warranty", label:"Warranties & liability", full:"Warranties, defects liability & insurance",
+    sub:"Coverage periods, defects obligations, and risk transfer clarity",
+    questions:[
+      {id:"wt1",q:"Are warranty periods clearly defined per asset type, and do they align with standard industry practice and the employer's needs?",hint:"DLP (Defects Liability Period) — typically 12–24 months for civil, longer for mechanical/electrical",concerns:["Short warranty period","Non-standard DLP","Warranty gaps between subcontractors"]},
+      {id:"wt2",q:"Is it clear what voids the warranty, and are any employer maintenance obligations that affect warranty validity documented?",hint:"Maintenance by non-approved parties, incorrect consumables, etc.",concerns:["Warranty void conditions unclear","Employer obligations not documented","Restrictive warranty conditions"]},
+      {id:"wt3",q:"Does the contractor carry adequate PI, PL and product liability insurance, and is this verified?",hint:"Professional indemnity, public liability — limits appropriate to asset value and risk",concerns:["Insurance limits insufficient","Insurance not verified","PI cover not confirmed"]}
+    ]
+  },
+  {
+    id:"training", label:"Training & handover", full:"Training & handover to operations team",
+    sub:"Knowledge transfer, O&M documentation, and operational readiness",
+    questions:[
+      {id:"tr1",q:"Is a structured O&M (Operation & Maintenance) manual included in the deliverables, specific to this installation?",hint:"Generic manufacturer manuals are not sufficient — site-specific documentation required",concerns:["Generic manuals only","No site-specific O&M","Incomplete documentation"]},
+      {id:"tr2",q:"Has a formal training programme been agreed, with defined competency outcomes for the employer's operations team?",hint:"Who, what, how long, assessed or unassessed? Include refresher training provisions.",concerns:["No training programme","Competency outcomes undefined","No refresher provision"]},
+      {id:"tr3",q:"Are handover conditions clearly defined — what must be demonstrated before practical completion is certified?",hint:"Performance testing, commissioning records, as-built drawings, SCADA configurations",concerns:["Handover conditions vague","No performance testing agreed","As-built drawings not committed"]}
+    ]
+  },
+  {
+    id:"opex", label:"Opex & Capex", full:"Opex and Capex of the development",
+    sub:"Whole-life cost transparency and cost allocation between employer and contractor",
+    questions:[
+      {id:"op1",q:"Has the contractor provided a whole-life cost model (Opex + Capex) for the asset over its design life?",hint:"Energy, routine maintenance, periodic overhauls, replacements — 25–30 year NPV",concerns:["No whole-life cost model","Opex estimates missing","No NPV analysis provided"]},
+      {id:"op2",q:"Is the boundary between employer-funded Opex (routine maintenance, energy) and contractor-funded Opex (warranty works, latent defects) clearly defined?",hint:"Grey areas here lead to disputes — must be explicit in the contract",concerns:["Opex boundary unclear","Latent defect responsibility grey","Routine vs remedial not defined"]},
+      {id:"op3",q:"Are future capital investment requirements (major overhauls, replacements) reflected in the employer's long-term financial planning?",hint:"Public finance projects require alignment with AMP cycles or equivalent capital programmes",concerns:["No AMP alignment","Future Capex not planned","Capital requirements not quantified"]}
+    ]
+  }
+];
+
+let current=0, answers={}, projName="", projContractor="", projDate="";
+
+function startAssessment() {
+  projName = document.getElementById("proj-name").value || "Unnamed project";
+  projContractor = document.getElementById("proj-contractor").value || "Not specified";
+  projDate = document.getElementById("proj-date").value || new Date().toISOString().split("T")[0];
+  document.getElementById("project-setup").style.display = "none";
+  document.getElementById("assess-title").textContent = projName;
+  document.getElementById("assess-sub").textContent = projContractor + " | " + projDate;
+  document.getElementById("assessment-view").style.display = "block";
+  buildTabs(); renderTopic(0);
+}
+
+function buildTabs() {
+  document.getElementById("topic-tabs").innerHTML = topics.map((t,i) =>
+    `<button class="tab-btn ${i===0?'active':''}" id="tab-${i}" onclick="jumpTo(${i})">${t.label}</button>`
+  ).join("");
+}
+
+function updateTabs() {
+  topics.forEach((t,i) => {
+    const done = t.questions.every(q => answers[q.id]&&answers[q.id].rating);
+    document.getElementById("tab-"+i).className = "tab-btn"+(i===current?" active":done?" done":"");
+  });
+}
+
+function renderTopic(idx) {
+  current = idx;
+  const t = topics[idx];
+  document.getElementById("prog-bar").style.width = Math.round((idx/topics.length)*100)+"%";
+  document.getElementById("prog-label").textContent = "Topic "+(idx+1)+" of "+topics.length+" — "+t.full;
+  const rLabels = ["Not addressed","Partially addressed","Mostly adequate","Fully addressed"];
+  const rCls = ["sel-1","sel-2","sel-3","sel-4"];
+  let html = `<div class="card"><div class="card-title">${t.full}</div><div class="card-sub">${t.sub}</div>`;
+  t.questions.forEach((q,qi) => {
+    const ans = answers[q.id]||{};
+    html += `<div class="question-row" style="${qi>0?'padding-top:1rem;border-top:0.5px solid #e8e6df':''}">`;
+    html += `<div class="q-label">Q${qi+1}. ${q.q}</div><div class="q-hint">${q.hint}</div>`;
+    html += `<div class="rating-row">`;
+    rLabels.forEach((label,ri) => {
+      const sel = ans.rating===ri+1?" "+rCls[ri]:"";
+      html += `<div class="r-btn${sel}" onclick="setRating('${q.id}',${ri+1},'${rCls[ri]}',this)">${label}</div>`;
+    });
+    html += `</div><div style="font-size:11px;color:#888780;margin-bottom:6px">Employer concerns flagged:</div>`;
+    html += `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">`;
+    q.concerns.forEach(c => {
+      const checked = ans.concerns&&ans.concerns.includes(c);
+      html += `<span class="concern-tag" style="opacity:${checked?1:0.4};border-color:${checked?'#378ADD':'transparent'}" onclick="toggleConcern('${q.id}','${c.replace(/'/g,"\\'")}',this)">${c}</span>`;
+    });
+    html += `</div><textarea placeholder="Contractor response / employer notes..." onchange="setNote('${q.id}',this.value)">${ans.note||""}</textarea></div>`;
+  });
+  html += `</div>`;
+  document.getElementById("topic-card").innerHTML = html;
+  document.getElementById("btn-prev").disabled = idx===0;
+  document.getElementById("btn-next").textContent = idx===topics.length-1?"View summary →":"Next topic →";
+  updateTabs();
+}
+
+function setRating(qid,val,cls,el) {
+  if(!answers[qid]) answers[qid]={};
+  answers[qid].rating=val;
+  el.parentElement.querySelectorAll(".r-btn").forEach(b=>b.className="r-btn");
+  el.className="r-btn "+cls;
+}
+
+function toggleConcern(qid,concern,el) {
+  if(!answers[qid]) answers[qid]={};
+  if(!answers[qid].concerns) answers[qid].concerns=[];
+  const idx=answers[qid].concerns.indexOf(concern);
+  if(idx>-1){answers[qid].concerns.splice(idx,1);el.style.opacity="0.4";el.style.borderColor="transparent";}
+  else{answers[qid].concerns.push(concern);el.style.opacity="1";el.style.borderColor="#378ADD";}
+}
+
+function setNote(qid,val) { if(!answers[qid]) answers[qid]={}; answers[qid].note=val; }
+function nextTopic() { if(current<topics.length-1) renderTopic(current+1); else showSummary(); }
+function prevTopic() { if(current>0) renderTopic(current-1); }
+function jumpTo(i) { renderTopic(i); }
+function getRisk(s) {
+  if(s<=1.5) return {label:"High risk",cls:"risk-high"};
+  if(s<=2.8) return {label:"Medium risk",cls:"risk-med"};
+  return {label:"Low risk",cls:"risk-low"};
+}
+
+function showSummary() {
+  document.getElementById("assessment-view").style.display="none";
+  const sv = document.getElementById("summary-view");
+  sv.style.display="block";
+  let totalR=0,totalC=0,flagged=0,unanswered=0,allQ=[],topicSums=[];
+  topics.forEach(t => {
+    let tR=0,tC=0,tConc=[];
+    t.questions.forEach(q => {
+      const ans=answers[q.id]||{};
+      if(ans.rating){totalR+=ans.rating;totalC++;tR+=ans.rating;tC++;}
+      else unanswered++;
+      if(ans.rating&&ans.rating<=2) flagged++;
+      if(ans.concerns) tConc=tConc.concat(ans.concerns);
+      allQ.push({topic:t.label,full:t.full,q:q.q,ans});
+    });
+    const tAvg=tC>0?tR/tC:0;
+    topicSums.push({t,tAvg,tRisk:tC>0?getRisk(tAvg):{label:"Not rated",cls:"risk-med"},tConc,tC});
+  });
+  const avg=totalC>0?totalR/totalC:0;
+  const avgStr=totalC>0?avg.toFixed(1):"—";
+  const overall=totalC>0?getRisk(avg):{label:"Not assessed",cls:"risk-med"};
+  const hiRisk=allQ.filter(i=>i.ans.rating&&i.ans.rating<=2);
+
+  let html=`<div class="brand"><h1>Assessment summary</h1><p>${projName} | ${projContractor} | ${projDate}</p></div>`;
+  html+=`<div class="summary-grid">`;
+  html+=`<div class="metric-card"><div class="metric-label">Overall score</div><div class="metric-val">${avgStr}<span style="font-size:14px;font-weight:400;color:#5F5E5A">/4</span></div></div>`;
+  html+=`<div class="metric-card"><div class="metric-label">Overall risk</div><div style="padding-top:8px"><span class="risk-badge ${overall.cls}">${overall.label}</span></div></div>`;
+  html+=`<div class="metric-card"><div class="metric-label">Items at risk</div><div class="metric-val">${flagged}</div></div>`;
+  html+=`<div class="metric-card"><div class="metric-label">Unanswered</div><div class="metric-val">${unanswered}</div></div>`;
+  html+=`</div>`;
+
+  html+=`<div class="card"><div class="card-title" style="margin-bottom:1rem">Topic breakdown</div>`;
+  topicSums.forEach(({t,tRisk,tConc})=>{
+    html+=`<div class="row-item"><div style="flex:1"><div style="font-weight:600;font-size:13px">${t.full}</div>`;
+    if(tConc.length) html+=`<div style="margin-top:5px">${tConc.map(c=>`<span class="concern-tag" style="opacity:1;border-color:#378ADD">${c}</span>`).join("")}</div>`;
+    html+=`</div><span class="risk-badge ${tRisk.cls}" style="white-space:nowrap;margin-left:8px">${tRisk.label}</span></div>`;
+  });
+  html+=`</div>`;
+
+  if(hiRisk.length){
+    html+=`<div class="card"><div class="card-title" style="margin-bottom:1rem">Items to resolve before agreement</div>`;
+    hiRisk.forEach(item=>{
+      html+=`<div class="row-item" style="flex-direction:column;align-items:flex-start;gap:4px">`;
+      html+=`<div style="font-size:11px;color:#888780">${item.topic}</div>`;
+      html+=`<div style="font-size:13px;color:#1a1a18">${item.q}</div>`;
+      if(item.ans.note) html+=`<div style="font-size:12px;color:#5F5E5A;font-style:italic">${item.ans.note}</div>`;
+      html+=`</div>`;
+    });
+    html+=`</div>`;
+  }
+
+  html+=`<button class="export-btn" onclick="printSummary()">Print / save as PDF</button>`;
+  html+=`<button class="export-btn secondary" style="margin-top:8px" onclick="restart()">Start new assessment</button>`;
+  sv.innerHTML=html;
+}
+
+function printSummary() { window.print(); }
+
+function restart() {
+  answers={}; projName=""; projContractor=""; projDate=""; current=0;
+  document.getElementById("summary-view").style.display="none";
+  document.getElementById("project-setup").style.display="block";
+}
+
+document.getElementById("proj-date").value = new Date().toISOString().split("T")[0];
+</script>
+</body>
+</html>
